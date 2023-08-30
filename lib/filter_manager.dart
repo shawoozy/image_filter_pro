@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:gems/presentation/feature/add-post/image_processor.dart';
+import 'image_processor.dart';
 
 import 'photo_filter.dart';
 import 'package:image/image.dart' as img;

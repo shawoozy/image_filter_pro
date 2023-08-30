@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](https://semver.org/).
 
+### Bug fix
+- Fixed when you tap hold, the image will show original
+
+## [0.1.1] - 2023-08-30
+
 ### Added
 - Initial release of the image_filter_pro package.
 

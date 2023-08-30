@@ -300,7 +300,7 @@ class _PhotoFilterState extends State<PhotoFilter> {
           _timer?.cancel();
           setState(() {
             _selectedFilter = _previousSelectedFilter ?? widget.presets[0];
-            _colorMatrix = _previousColorMatrix!;
+            _colorMatrix = _previousColorMatrix ?? _colorMatrix;
           });
         },
         child: ColorFiltered(
