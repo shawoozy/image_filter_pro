@@ -1,3 +1,4 @@
+
 # Image Filter Pro
 
 Hi! This is my first package published to help you out!
@@ -16,7 +17,7 @@ Image Filter Pro is a Flutter package that provides a convenient way to apply co
 Add the following dependency to your `pubspec.yaml` file:
 
 `dependencies:
-  image_filter_pro: ^0.1.0` 
+image_filter_pro: ^0.1.0`
 
 ## Usage
 
@@ -27,35 +28,67 @@ Import the package:
 
 Use the `ImageFilterWidget` in your widget tree:
 
-    class MyImageFilterApp extends StatelessWidget {
-      @override
-      Widget build(BuildContext context) {
-        return MaterialApp(
-          home: Scaffold(
-            appBar: AppBar(
-              title: Text('Image Filter App'),
-            ),
-            body: Center(
-              child: ImageFilterWidget(
-                image: File('path_to_your_image.jpg'),
-                filters: NamedColorFilter.defaultFilters(),
-                cancelIcon: Icons.cancel,
-                applyIcon: Icons.check,
-                backgroundColor: Colors.black,
-                sliderColor: Colors.blue,
-                sliderLabelStyle: TextStyle(color: Colors.white),
-                bottomButtonsTextStyle: TextStyle(color: Colors.white),
-                filtersLabelTextStyle: TextStyle(color: Colors.white),
-                applyingTextStyle: TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-        );
-      }
-    }
-    
-    void main() {
-      runApp(MyImageFilterApp());
+    class FilteredImageWidget extends StatefulWidget {  
+      @override  
+      _FilteredImageWidgetState createState() => _FilteredImageWidgetState();  
+    }  
+      
+    class _FilteredImageWidgetState extends State<FilteredImageWidget> {  
+      File? image;  
+      
+      void _showImagePicker() async {  
+        // Implement your image picker logic here  
+        // Set the selected image as the imageFile 
+        // For example: 
+        // var pickedImage = await ImagePicker.pickImage(source: ImageSource.gallery); 
+        // setState(() { 
+        //   imageFile = pickedImage; 
+        // });  
+      var updatedImage = await Navigator.of(context).push(  
+          MaterialPageRoute(  
+            builder: (context) => PhotoFilter(  
+              image: imageFile,  
+              presets: NamedColorFilter.defaultFilters(),  
+              cancelIcon: Icons.cancel,  
+              applyIcon: Icons.check,  
+              backgroundColor: Colors.black,  
+              sliderColor: Colors.blue,  
+              sliderLabelStyle: TextStyle(color: Colors.white),  
+              bottomButtonsTextStyle: TextStyle(color: Colors.white),  
+              presetsLabelTextStyle: TextStyle(color: Colors.white),  
+              applyingTextStyle: TextStyle(color: Colors.white),  
+            ),  
+          ),  
+        );  
+      
+        if (updatedImage != null) {  
+          setState(() {  
+            this.image = updatedImage;  
+          });  
+        }  
+      }  
+      
+      @override  
+      Widget build(BuildContext context) {  
+        return Scaffold(  
+          appBar: AppBar(  
+            title: Text('Image Filter App'),  
+          ),  
+          body: Center(  
+            child: Column(  
+              mainAxisAlignment: MainAxisAlignment.center,  
+              children: [  
+                ElevatedButton(  
+                  onPressed: _showImagePicker,  
+                  child: Text('Pick and Filter Image'),  
+                ),  
+                if (image != null)  
+                  Image.file(image!),  
+              ],  
+            ),  
+          ),  
+        );  
+      }  
     }
 
 You can also provide your own set of presets like this:
