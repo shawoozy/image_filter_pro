@@ -1,0 +1,10 @@
+name: image_filter_pro
+version: 0.1.0
+description: A Flutter package for applying color filters to images with 
+presets and manual sliders
+homepage: https://github.com/sharokh1/image_filter_pro
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
