@@ -1,6 +1,5 @@
-# Changelog
 
-All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](https://semver.org/).
+# Changelog
 
 ### Bug fix
 - Fixed when you tap hold, the image will show original
@@ -11,5 +10,3 @@ All notable changes to this project will be documented in this file. This projec
 - Initial release of the image_filter_pro package.
 
 ## [0.1.0] - 2023-08-30
-
-[0.1.0]: https://github.com/your-username/your-repo/releases/tag/v0.1.0
