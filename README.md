@@ -93,7 +93,7 @@ Use the `ImageFilterWidget` in your widget tree:
 
 You can also provide your own set of presets like this:
 
-    ImageFilterWidget(
+    PhotoFilter(
                   filters: [
     		                  // Always add the "default" one
     						  NamedColorFilter(  
@@ -145,6 +145,9 @@ Or if you want to extend:
     						  ),  
     					]
             )
+
+So this widget expects a File, and returns a File.
+In the future it might have more options.
 
 ## Screenshots
 
