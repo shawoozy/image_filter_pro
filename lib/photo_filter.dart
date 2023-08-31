@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_filter_pro/apply_filter_params.dart';
 
 import 'filter_manager.dart';
 import 'named_color_filter.dart';
@@ -48,7 +49,7 @@ class PhotoFilter extends StatefulWidget {
   final VoidCallback? onCancel;
 
   /// The call back when tapping on the submit/apply icon.
-  final void Function(File)? onApply;
+  final void Function(ApplyFilterParams?)? onApply;
 
   /// Creates a new ImageFilterWidget instance.
   ///
@@ -86,20 +87,19 @@ class PhotoFilter extends StatefulWidget {
   /// The [onApply] parameter defines the call back action
   /// to trigger when tapping on the apply/submit icon. By default this pops the page with the file as a result.
   ///
-  const PhotoFilter(
-      {super.key,
-      required this.image,
-      this.presets = defaultColorFilters,
-      required this.cancelIcon,
-      required this.applyIcon,
-      this.backgroundColor = Colors.black,
-      this.sliderColor,
-      this.sliderLabelStyle,
-      this.bottomButtonsTextStyle,
-      this.presetsLabelTextStyle,
-      this.applyingTextStyle,
-      this.onCancel,
-      this.onApply});
+  const PhotoFilter({super.key,
+    required this.image,
+    this.presets = defaultColorFilters,
+    required this.cancelIcon,
+    required this.applyIcon,
+    this.backgroundColor = Colors.black,
+    this.sliderColor,
+    this.sliderLabelStyle,
+    this.bottomButtonsTextStyle,
+    this.presetsLabelTextStyle,
+    this.applyingTextStyle,
+    this.onCancel,
+    this.onApply});
 
   @override
   _PhotoFilterState createState() => _PhotoFilterState();
@@ -118,26 +118,10 @@ class _PhotoFilterState extends State<PhotoFilter> {
   List<double>? _previousColorMatrix;
 
   List<double> _colorMatrix = [
-    1,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
+    1, 0, 0, 0, 0,
+    0, 1, 0, 0, 0,
+    0, 0, 1, 0, 0,
+    0, 0, 0, 1, 0,
   ];
 
   @override
@@ -191,9 +175,9 @@ class _PhotoFilterState extends State<PhotoFilter> {
                   color: Colors.black.withOpacity(.9),
                   child: Center(
                       child: Text(
-                    "Applying filter...",
-                    style: widget.applyingTextStyle ?? const TextStyle(color: Colors.grey, fontSize: 13),
-                  )),
+                        "Applying filter...",
+                        style: widget.applyingTextStyle ?? const TextStyle(color: Colors.grey, fontSize: 13),
+                      )),
                 ))
           ]
         ],
@@ -313,30 +297,14 @@ class _PhotoFilterState extends State<PhotoFilter> {
         onTapDown: (_) {
           _timer = Timer(
             const Duration(milliseconds: 350),
-            () {
+                () {
               setState(() {
                 _selectedFilter = widget.presets.first;
                 _colorMatrix = [
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
+                  1, 0, 0, 0, 0,
+                  0, 1, 0, 0, 0,
+                  0, 0, 1, 0, 0,
+                  0, 0, 0, 1, 0,
                 ];
               });
             },
@@ -392,24 +360,33 @@ class _PhotoFilterState extends State<PhotoFilter> {
             IconButton(
                 onPressed: () async {
                   if (_selectedFilter!.name == 'None') {
-                    widget.onApply?.call(widget.image);
-                    if (widget.onApply == null) {
-                      Navigator.of(context).pop(null);
-                      return;
-                    }
+                    widget.onApply?.call(null);
+                    Navigator.of(context).pop();
+                    return;
+                  }
+
+                  if (widget.onApply != null) {
+                    widget.onApply!.call(ApplyFilterParams(colorMatrix: _selectedFilter!.colorFilterMatrix,
+                        brightness: _brightness,
+                        contrast: _contrast,
+                        saturation: _saturation,
+                        defaultMatrix: _colorMatrix));
+                    Navigator.of(context).pop();
+                    return;
                   }
                   setState(() {
                     _isApplying = true;
                   });
-
                   await Future.delayed(const Duration(milliseconds: 100));
-                  File filteredImageFile = await FilterManager()
-                      .applyColorFilterToFile(widget.image, _selectedFilter!.colorFilterMatrix, _brightness, _contrast, _saturation, _colorMatrix);
 
-                  widget.onApply?.call(filteredImageFile);
-                  if (context.mounted) {
-                    Navigator.of(context).pop(filteredImageFile);
-                  }
+                  File filteredImageFile = await FilterManager()
+                      .applyFilter(widget.image, ApplyFilterParams(colorMatrix: _selectedFilter!.colorFilterMatrix,
+                      brightness: _brightness,
+                      contrast: _contrast,
+                      saturation: _saturation,
+                      defaultMatrix: _colorMatrix));
+
+                  Navigator.of(context).pop(filteredImageFile);
                 },
                 icon: Icon(
                   widget.applyIcon,
@@ -425,76 +402,29 @@ class _PhotoFilterState extends State<PhotoFilter> {
   List<double> _generateColorMatrix() {
     var brightness = _brightness;
     final List<double> brightnessMatrix = [
-      brightness,
-      0,
-      0,
-      0,
-      0,
-      0,
-      brightness,
-      0,
-      0,
-      0,
-      0,
-      0,
-      brightness,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
+      brightness, 0, 0, 0, 0,
+      0, brightness, 0, 0, 0,
+      0, 0, brightness, 0,
+      0, 0, 0, 0, 1, 0,
     ];
     var contrast = 1.9949 - _contrast;
 
     final List<double> contrastMatrix = [
-      contrast,
-      0,
-      0,
-      0,
-      128 * (1 - contrast),
-      0,
-      contrast,
-      0,
-      0,
-      128 * (1 - contrast),
-      0,
-      0,
-      contrast,
-      0,
-      128 * (1 - contrast),
-      0,
-      0,
-      0,
-      1,
-      0,
+      contrast, 0, 0, 0, 128 * (1 - contrast),
+      0, contrast, 0, 0, 128 * (1 - contrast),
+      0, 0, contrast, 0, 128 * (1 - contrast),
+      0, 0, 0, 1, 0,
     ];
 
     var saturation = _saturation;
 
     final List<double> saturationMatrix = [
-      0.213 + 0.787 * saturation,
-      0.715 - 0.715 * saturation,
-      0.072 - 0.072 * saturation,
-      0,
-      0,
-      0.213 - 0.213 * saturation,
-      0.715 + 0.285 * saturation,
-      0.072 - 0.072 * saturation,
-      0,
-      0,
-      0.213 - 0.213 * saturation,
-      0.715 - 0.715 * saturation,
-      0.072 + 0.928 * saturation,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
+      0.213 + 0.787 * saturation, 0.715 - 0.715 * saturation, 0.072 - 0.072 * saturation, 0, 0, 0.213 - 0.213 * saturation,
+      0.715 + 0.285 * saturation, 0.072 - 0.072 * saturation, 0, 0, 0.213 - 0.213 * saturation, 0.715 - 0.715 * saturation,
+      0.072 + 0.928 * saturation, 0, 0, 0,
+      0, 0, 1, 0,
     ];
+
 
     var result = _multiplyMatrices(brightnessMatrix, contrastMatrix);
     result = _multiplyMatrices(result, saturationMatrix);

@@ -1,12 +1,13 @@
 import 'dart:io';
+import 'package:image_filter_pro/apply_filter_params.dart';
+
 import 'image_processor.dart';
 
 import 'photo_filter.dart';
 import 'package:image/image.dart' as img;
 
 class FilterManager {
-  Future<File> applyColorFilterToFile(
-      File rawFile, List<double> colorMatrix, double brightness, double contrast, double saturation, List<double> defaultMatrix) async {
+  Future<File> applyFilter(File rawFile, ApplyFilterParams applyFilterParams) async {
     final img.Image? image = await ImageProcessor.loadImage(rawFile);
 
     if (image == null) throw Exception("Failed to decode image");
@@ -21,14 +22,14 @@ class FilterManager {
         final num green = pixel.g;
         final num blue = pixel.b;
 
-        final newColor = multiplyByColorFilter([red, green, blue, alpha], colorMatrix);
+        final newColor = multiplyByColorFilter([red, green, blue, alpha], applyFilterParams.colorMatrix);
 
         final color = img.ColorRgba8(newColor[0], newColor[1], newColor[2], newColor[3]);
         image.setPixel(x, y, color);
       }
     }
 
-    if (brightness != midBrightness || contrast != midContrast || saturation != midSaturation) {
+    if (applyFilterParams.brightness != midBrightness || applyFilterParams.contrast != midContrast || applyFilterParams.saturation != midSaturation) {
       for (int y = 0; y < image.height; y++) {
         for (int x = 0; x < image.width; x++) {
           final img.Pixel pixel = image.getPixel(x, y);
@@ -38,7 +39,7 @@ class FilterManager {
           final num green = pixel.g;
           final num blue = pixel.b;
 
-          final newColor = multiplyByColorFilter([red, green, blue, alpha], defaultMatrix);
+          final newColor = multiplyByColorFilter([red, green, blue, alpha], applyFilterParams.defaultMatrix);
 
           final color = img.ColorRgba8(newColor[0], newColor[1], newColor[2], newColor[3]);
           image.setPixel(x, y, color);
