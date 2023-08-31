@@ -9,7 +9,7 @@ Image Filter Pro is a Flutter package that provides a convenient way to apply co
 ## Features
 
 - Apply various preset color filters to images.
-- Easily integrate customizable filter UI into your Flutter app.
+- Easily integrate customisable filter UI into your Flutter app.
 - Inspired by popular filter presets found in other image editing apps.
 
 
@@ -27,13 +27,15 @@ Import the package:
 import 'package:flutter/material.dart'; import 'package:image_filter_pro/image_filter_pro.dart';  
 Use the `ImageFilterWidget` in your widget tree:
 
-class FilteredImageWidget extends StatefulWidget {      @override    
-_FilteredImageWidgetState createState() => _FilteredImageWidgetState();    
-}
 
-    class _FilteredImageWidgetState extends State<FilteredImageWidget> {    
-      File? image;    
-        
+     class FilteredImageWidget extends StatefulWidget {      
+     @override    
+          _FilteredImageWidgetState createState() => _FilteredImageWidgetState();    
+        }    
+            
+        class _FilteredImageWidgetState extends State<FilteredImageWidget> {    
+          File? image;  
+     
       void _showImagePicker() async {    
         // Implement your image picker logic here    
         // Set the selected image as the imageFile   
@@ -149,7 +151,6 @@ It is also possible to trigger callback when tapping in cancel or on apply filte
 
 
      PhotoFilter( 
-		 image: someFile,
 	     //...the rest of the params 
 	     onCancel: () => // do something,
 	     onStartApplyingFilter: () => // show loader or something similar, 
