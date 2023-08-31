@@ -7,8 +7,8 @@ import 'photo_filter.dart';
 import 'package:image/image.dart' as img;
 
 class FilterManager {
-  Future<File> applyFilter(File rawFile, ApplyFilterParams applyFilterParams) async {
-    final img.Image? image = await ImageProcessor.loadImage(rawFile);
+  static Future<File> applyFilter(ApplyFilterParams applyFilterParams) async {
+    final img.Image? image = await ImageProcessor.loadImage(applyFilterParams.rawFile);
 
     if (image == null) throw Exception("Failed to decode image");
 
@@ -22,7 +22,7 @@ class FilterManager {
         final num green = pixel.g;
         final num blue = pixel.b;
 
-        final newColor = multiplyByColorFilter([red, green, blue, alpha], applyFilterParams.colorMatrix);
+        final newColor = _multiplyByColorFilter([red, green, blue, alpha], applyFilterParams.colorMatrix);
 
         final color = img.ColorRgba8(newColor[0], newColor[1], newColor[2], newColor[3]);
         image.setPixel(x, y, color);
@@ -39,7 +39,7 @@ class FilterManager {
           final num green = pixel.g;
           final num blue = pixel.b;
 
-          final newColor = multiplyByColorFilter([red, green, blue, alpha], applyFilterParams.defaultMatrix);
+          final newColor = _multiplyByColorFilter([red, green, blue, alpha], applyFilterParams.defaultMatrix);
 
           final color = img.ColorRgba8(newColor[0], newColor[1], newColor[2], newColor[3]);
           image.setPixel(x, y, color);
@@ -50,7 +50,7 @@ class FilterManager {
     return await ImageProcessor.saveImage(image);
   }
 
-  List<int> multiplyByColorFilter(List<num> color, List<double> matrix) {
+  static List<int> _multiplyByColorFilter(List<num> color, List<double> matrix) {
     final r = (color[0] * matrix[0] + color[1] * matrix[1] + color[2] * matrix[2] + color[3] * matrix[3] + matrix[4]).clamp(0, 255).toInt();
     final g = (color[0] * matrix[5] + color[1] * matrix[6] + color[2] * matrix[7] + color[3] * matrix[8] + matrix[9]).clamp(0, 255).toInt();
     final b = (color[0] * matrix[10] + color[1] * matrix[11] + color[2] * matrix[12] + color[3] * matrix[13] + matrix[14]).clamp(0, 255).toInt();

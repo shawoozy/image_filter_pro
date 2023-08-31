@@ -18,7 +18,7 @@ Image Filter Pro is a Flutter package that provides a convenient way to apply co
 Add the following dependency to your `pubspec.yaml` file:
 
 `dependencies:  
-image_filter_pro: ^0.1.5`
+image_filter_pro: ^0.1.7`
 
 ## Usage
 
@@ -151,26 +151,14 @@ It is also possible to trigger callback when tapping in cancel or on apply filte
      PhotoFilter( 
 		 image: someFile,
 	     //...the rest of the params 
-	     onCancel: () => // do something, 
-	     onApply: (ApplyFilterParams? applyFilterParams) async {
-		     // always add a small delay
-		     // to give time to the garbage collector to dispose the filter widget
-		     await Future.delayed(const Duration(milliseconds: 100));
-		     // maybe show a loader or something like that
-		     setState(() {  
-				  _isLoading = true;  
-				});
-		     File updatedImage = await FilterManager().applyFilter(someFile, applyFilterParams);
-		     // do something with the updatedImage;
-		        setState(() {  
-				  _isLoading = false;  
-				});
-	     }
+	     onCancel: () => // do something,
+	     onStartApplyingFilter: () => // show loader or something similar, 
+	     onFinishApplyingFilter: (File? file) => // do something with edited image
      )  
 
 ## Screenshots
 
-![enter image description here](https://github.com/sharokh1/image_filter_pro/blob/main/example_filter.gif?raw=true)
+![enter image description here](https://github.com/shawoozy/image_filter_pro/blob/main/example_filter.gif?raw=true)
 
 ## License
 

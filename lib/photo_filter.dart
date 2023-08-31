@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -48,8 +49,11 @@ class PhotoFilter extends StatefulWidget {
   /// The call back when tapping on the cancel icon.
   final VoidCallback? onCancel;
 
-  /// The call back when tapping on the submit/apply icon.
-  final void Function(ApplyFilterParams?)? onApply;
+  /// The call back when isolate starts to apply filter and generate new Image.
+  final VoidCallback? onStartApplyingFilter;
+
+  /// The call back when applying filter is finished to apply filter and generate new Image.
+  final void Function(File?)? onFinishApplyingFilter;
 
   /// Creates a new ImageFilterWidget instance.
   ///
@@ -84,8 +88,11 @@ class PhotoFilter extends StatefulWidget {
   /// The [onCancel] parameter defines the call back action
   /// to trigger when tapping on the cancel icon. By default this pops the page.
   ///
-  /// The [onApply] parameter defines the call back action
-  /// to trigger when tapping on the apply/submit icon. By default this pops the page with the file as a result.
+  /// The [onStartApplyingFilter] parameter defines the call back action
+  /// to trigger when tapping on the apply/submit icon.
+  ///
+  /// The [onFinishApplyingFilter] parameter defines the call back action
+  /// to trigger when applying the filter is done.
   ///
   const PhotoFilter({super.key,
     required this.image,
@@ -98,8 +105,7 @@ class PhotoFilter extends StatefulWidget {
     this.bottomButtonsTextStyle,
     this.presetsLabelTextStyle,
     this.applyingTextStyle,
-    this.onCancel,
-    this.onApply});
+    this.onCancel, this.onStartApplyingFilter, this.onFinishApplyingFilter});
 
   @override
   _PhotoFilterState createState() => _PhotoFilterState();
@@ -360,33 +366,43 @@ class _PhotoFilterState extends State<PhotoFilter> {
             IconButton(
                 onPressed: () async {
                   if (_selectedFilter!.name == 'None') {
-                    widget.onApply?.call(null);
+                    widget.onFinishApplyingFilter?.call(null);
                     Navigator.of(context).pop();
                     return;
                   }
+                  widget.onStartApplyingFilter?.call();
+                  if(widget.onFinishApplyingFilter != null){
+                    Navigator.of(context).pop();
+                  }else {
+                    setState(() {
+                      _isApplying = true;
+                    });
+                  }
+                  Isolate? _newIsolate;
 
-                  if (widget.onApply != null) {
-                    widget.onApply!.call(ApplyFilterParams(colorMatrix: _selectedFilter!.colorFilterMatrix,
-                        brightness: _brightness,
-                        contrast: _contrast,
-                        saturation: _saturation,
-                        defaultMatrix: _colorMatrix));
-                    Navigator.of(context).pop();
-                    return;
-                  }
-                  setState(() {
-                    _isApplying = true;
+                  final ReceivePort _receivePort = ReceivePort();
+                  _newIsolate = await Isolate.spawn(
+                      _applyFilter,
+                      ApplyFilterParams(
+                          rootIsolateToken: RootIsolateToken.instance!,
+                          rawFile: widget.image,
+                          colorMatrix: _selectedFilter!.colorFilterMatrix,
+                          brightness: _brightness,
+                          contrast: _contrast,
+                          saturation: _saturation,
+                          defaultMatrix: _colorMatrix,
+                          sendPort: _receivePort.sendPort));
+
+                  _receivePort.listen((message) {
+                    if (message != null) {
+                      widget.onFinishApplyingFilter?.call(message);
+                      if(context.mounted){
+                        Navigator.of(context).pop(message);
+                      }
+                    }
+                    _newIsolate?.kill(priority: Isolate.immediate);
+                    _newIsolate = null;
                   });
-                  await Future.delayed(const Duration(milliseconds: 100));
-
-                  File filteredImageFile = await FilterManager()
-                      .applyFilter(widget.image, ApplyFilterParams(colorMatrix: _selectedFilter!.colorFilterMatrix,
-                      brightness: _brightness,
-                      contrast: _contrast,
-                      saturation: _saturation,
-                      defaultMatrix: _colorMatrix));
-
-                  Navigator.of(context).pop(filteredImageFile);
                 },
                 icon: Icon(
                   widget.applyIcon,
@@ -397,6 +413,12 @@ class _PhotoFilterState extends State<PhotoFilter> {
         ),
       ),
     );
+  }
+
+  static void _applyFilter(ApplyFilterParams applyFilterParams) async {
+    BackgroundIsolateBinaryMessenger.ensureInitialized(applyFilterParams.rootIsolateToken);
+    File filteredImageFile = await FilterManager.applyFilter(applyFilterParams);
+    applyFilterParams.sendPort.send(filteredImageFile);
   }
 
   List<double> _generateColorMatrix() {
