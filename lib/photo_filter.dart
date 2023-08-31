@@ -44,6 +44,12 @@ class PhotoFilter extends StatefulWidget {
   /// The text style for the message displayed while filters are being applied.
   final TextStyle? applyingTextStyle;
 
+  /// The call back when tapping on the cancel icon.
+  final VoidCallback? onCancel;
+
+  /// The call back when tapping on the submit/apply icon.
+  final void Function(File)? onApply;
+
   /// Creates a new ImageFilterWidget instance.
   ///
   /// The [image] parameter specifies the image to which filters will be applied.
@@ -73,7 +79,13 @@ class PhotoFilter extends StatefulWidget {
   ///
   /// The [applyingTextStyle] parameter defines the text style for the message
   /// that appears while filters are being applied to the image.
-
+  ///
+  /// The [onCancel] parameter defines the call back action
+  /// to trigger when tapping on the cancel icon. By default this pops the page.
+  ///
+  /// The [onApply] parameter defines the call back action
+  /// to trigger when tapping on the apply/submit icon. By default this pops the page with the file as a result.
+  ///
   const PhotoFilter(
       {super.key,
       required this.image,
@@ -85,7 +97,9 @@ class PhotoFilter extends StatefulWidget {
       this.sliderLabelStyle,
       this.bottomButtonsTextStyle,
       this.presetsLabelTextStyle,
-      this.applyingTextStyle});
+      this.applyingTextStyle,
+      this.onCancel,
+      this.onApply});
 
   @override
   _PhotoFilterState createState() => _PhotoFilterState();
@@ -104,10 +118,26 @@ class _PhotoFilterState extends State<PhotoFilter> {
   List<double>? _previousColorMatrix;
 
   List<double> _colorMatrix = [
-    1, 0, 0, 0, 0,
-    0, 1, 0, 0, 0,
-    0, 0, 1, 0, 0,
-    0, 0, 0, 1, 0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
   ];
 
   @override
@@ -287,10 +317,26 @@ class _PhotoFilterState extends State<PhotoFilter> {
               setState(() {
                 _selectedFilter = widget.presets.first;
                 _colorMatrix = [
-                  1, 0, 0, 0, 0,
-                  0, 1, 0, 0, 0,
-                  0, 0, 1, 0, 0,
-                  0, 0, 0, 1, 0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
                 ];
               });
             },
@@ -334,7 +380,7 @@ class _PhotoFilterState extends State<PhotoFilter> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             IconButton(
-                onPressed: () => Navigator.of(context).pop(null),
+                onPressed: () => widget.onCancel ?? Navigator.of(context).pop(null),
                 icon: Icon(
                   widget.cancelIcon,
                   color: Colors.white,
@@ -343,18 +389,25 @@ class _PhotoFilterState extends State<PhotoFilter> {
             IconButton(
                 onPressed: () async {
                   if (_selectedFilter!.name == 'None') {
-                    Navigator.of(context).pop(null);
-                    return;
+                    widget.onApply?.call(widget.image);
+                    if (widget.onApply == null) {
+                      Navigator.of(context).pop(null);
+                      return;
+                    }
                   }
                   setState(() {
                     _isApplying = true;
                   });
 
                   await Future.delayed(const Duration(milliseconds: 100));
-                  File filteredImageFile = await FilterManager().applyColorFilterToFile(widget.image, _selectedFilter!.colorFilterMatrix, _brightness, _contrast, _saturation, _colorMatrix);
-                  if (context.mounted) {
+                  File filteredImageFile = await FilterManager()
+                      .applyColorFilterToFile(widget.image, _selectedFilter!.colorFilterMatrix, _brightness, _contrast, _saturation, _colorMatrix);
+                  if (widget.onApply == null && context.mounted) {
                     Navigator.of(context).pop(filteredImageFile);
+                    return;
                   }
+
+                  widget.onApply?.call(filteredImageFile);
                 },
                 icon: Icon(
                   widget.applyIcon,
@@ -366,8 +419,6 @@ class _PhotoFilterState extends State<PhotoFilter> {
       ),
     );
   }
-
-
 
   List<double> _generateColorMatrix() {
     var brightness = _brightness;

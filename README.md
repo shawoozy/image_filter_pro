@@ -93,61 +93,65 @@ Use the `ImageFilterWidget` in your widget tree:
 
 You can also provide your own set of presets like this:
 
-    PhotoFilter(
-                  filters: [
-    		                  // Always add the "default" one
-    						  NamedColorFilter(  
-    						    colorFilterMatrix: [],  
-    						    name: "None",  
-    						  ),  
-    						  NamedColorFilter(  
-    						    colorFilterMatrix: [  
-    						      0.8, 0.1, 0.1, 0, 20,  
-    						      0.1, 0.8, 0.1, 0, 20,  
-    						      0.1, 0.1, 0.8, 0, 20,  
-    						      0, 0, 0, 1, 0,  
-    						    ],  
-    						    name: "Vintage",  
-    						  ),  
-    						  NamedColorFilter(  
-    						    colorFilterMatrix: [  
-    						      1.2, 0.1, 0.1, 0, 10,  
-    						      0.1, 1, 0.1, 0, 10,  
-    						      0.1, 0.1, 1, 0, 10,  
-    						      0, 0, 0, 1, 0,  
-    						    ],  
-    						    name: 'Mood',  
-    						  ),  
-    					]
-            )
+    ImageFilterWidget(
+        filters: [
+    		 // Always add the "default" one
+    			  NamedColorFilter(  
+    				colorFilterMatrix: [],  
+    			    name: "None"),  
+    			  NamedColorFilter(  
+    				colorFilterMatrix: [  
+    					0.8, 0.1, 0.1, 0, 20,  
+    					0.1, 0.8, 0.1, 0, 20,  
+    					0.1, 0.1, 0.8, 0, 20,  
+    					0, 0, 0, 1, 0,  
+    				  ],  
+    				name: "Vintage"),  
+    			  NamedColorFilter(  
+    				colorFilterMatrix: [  
+    					1.2, 0.1, 0.1, 0, 10,  
+    					0.1, 1, 0.1, 0, 10,  
+    					0.1, 0.1, 1, 0, 10,  
+    					0, 0, 0, 1, 0,  
+    				    ],  
+    				 name: 'Mood'),  
+    		]
+          )
 
 Or if you want to extend:
 
     ImageFilterWidget(
-                  filters:  NamedColorFilter.defaultFilters().toList().addAll([ 
-    						  NamedColorFilter(  
-    						    colorFilterMatrix: [  
-    						      0.8, 0.1, 0.1, 0, 20,  
-    						      0.1, 0.8, 0.1, 0, 20,  
-    						      0.1, 0.1, 0.8, 0, 20,  
-    						      0, 0, 0, 1, 0,  
-    						    ],  
-    						    name: "Vintage",  
-    						  ),  
-    						  NamedColorFilter(  
-    						    colorFilterMatrix: [  
-    						      1.2, 0.1, 0.1, 0, 10,  
-    						      0.1, 1, 0.1, 0, 10,  
-    						      0.1, 0.1, 1, 0, 10,  
-    						      0, 0, 0, 1, 0,  
-    						    ],  
-    						    name: 'Mood',  
-    						  ),  
+	   //...the rest of the params
+       filters:  NamedColorFilter.defaultFilters()
+                  .toList()
+                  .addAll([ 
+    					    NamedColorFilter(  
+    						  colorFilterMatrix: [  
+    						     0.8, 0.1, 0.1, 0, 20,  
+    						     0.1, 0.8, 0.1, 0, 20,  
+    						     0.1, 0.1, 0.8, 0, 20,  
+    						     0, 0, 0, 1, 0,  
+    						   ],  
+    						  name: "Vintage"),  
+    						 NamedColorFilter(  
+    						   colorFilterMatrix: [  
+    						     1.2, 0.1, 0.1, 0, 10,  
+    						     0.1, 1, 0.1, 0, 10,  
+    						     0.1, 0.1, 1, 0, 10,  
+    						     0, 0, 0, 1, 0,  
+    						   ],  
+    						   name: 'Mood'),  
     					]
             )
 
-So this widget expects a File, and returns a File.
-In the future it might have more options.
+By default, the widget will just pop itself when tapping on cancel or apply icons.
+It is also possible to trigger callback when tapping in cancel or on apply filter:
+
+    ImageFilterWidget(
+    	   //...the rest of the params
+    	   onCancel: () => // do something,
+    	   onApply: (File? file) => // do something with file
+    	   )
 
 ## Screenshots
 
