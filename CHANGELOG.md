@@ -1,6 +1,11 @@
 
 # Changelog
 
+### Bug fix
+- Minor bug fix
+
+## [0.1.4] - 2023-08-31
+
 ### Added
 - Added onCancel and onApply callbacks
 

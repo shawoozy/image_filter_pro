@@ -380,7 +380,10 @@ class _PhotoFilterState extends State<PhotoFilter> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             IconButton(
-                onPressed: () => widget.onCancel ?? Navigator.of(context).pop(null),
+                onPressed: () {
+                  widget.onCancel?.call();
+                  Navigator.of(context).pop(null);
+                },
                 icon: Icon(
                   widget.cancelIcon,
                   color: Colors.white,
@@ -402,12 +405,11 @@ class _PhotoFilterState extends State<PhotoFilter> {
                   await Future.delayed(const Duration(milliseconds: 100));
                   File filteredImageFile = await FilterManager()
                       .applyColorFilterToFile(widget.image, _selectedFilter!.colorFilterMatrix, _brightness, _contrast, _saturation, _colorMatrix);
-                  if (widget.onApply == null && context.mounted) {
-                    Navigator.of(context).pop(filteredImageFile);
-                    return;
-                  }
 
                   widget.onApply?.call(filteredImageFile);
+                  if (context.mounted) {
+                    Navigator.of(context).pop(filteredImageFile);
+                  }
                 },
                 icon: Icon(
                   widget.applyIcon,
@@ -423,27 +425,75 @@ class _PhotoFilterState extends State<PhotoFilter> {
   List<double> _generateColorMatrix() {
     var brightness = _brightness;
     final List<double> brightnessMatrix = [
-      brightness, 0, 0, 0, 0,
-      0, brightness, 0, 0, 0,
-      0, 0, brightness, 0,
-      0, 0, 0, 0, 1, 0,
+      brightness,
+      0,
+      0,
+      0,
+      0,
+      0,
+      brightness,
+      0,
+      0,
+      0,
+      0,
+      0,
+      brightness,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
     ];
     var contrast = 1.9949 - _contrast;
 
     final List<double> contrastMatrix = [
-      contrast, 0, 0, 0, 128 * (1 - contrast),
-      0, contrast, 0, 0, 128 * (1 - contrast),
-      0, 0, contrast, 0, 128 * (1 - contrast),
-      0, 0, 0, 1, 0,
+      contrast,
+      0,
+      0,
+      0,
+      128 * (1 - contrast),
+      0,
+      contrast,
+      0,
+      0,
+      128 * (1 - contrast),
+      0,
+      0,
+      contrast,
+      0,
+      128 * (1 - contrast),
+      0,
+      0,
+      0,
+      1,
+      0,
     ];
 
     var saturation = _saturation;
 
     final List<double> saturationMatrix = [
-      0.213 + 0.787 * saturation, 0.715 - 0.715 * saturation, 0.072 - 0.072 * saturation, 0, 0, 0.213 - 0.213 * saturation,
-      0.715 + 0.285 * saturation, 0.072 - 0.072 * saturation, 0, 0, 0.213 - 0.213 * saturation, 0.715 - 0.715 * saturation,
-      0.072 + 0.928 * saturation, 0, 0, 0,
-      0, 0, 1, 0,
+      0.213 + 0.787 * saturation,
+      0.715 - 0.715 * saturation,
+      0.072 - 0.072 * saturation,
+      0,
+      0,
+      0.213 - 0.213 * saturation,
+      0.715 + 0.285 * saturation,
+      0.072 - 0.072 * saturation,
+      0,
+      0,
+      0.213 - 0.213 * saturation,
+      0.715 - 0.715 * saturation,
+      0.072 + 0.928 * saturation,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
     ];
 
     var result = _multiplyMatrices(brightnessMatrix, contrastMatrix);

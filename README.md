@@ -17,7 +17,7 @@ Image Filter Pro is a Flutter package that provides a convenient way to apply co
 Add the following dependency to your `pubspec.yaml` file:
 
 `dependencies:
-image_filter_pro: ^0.1.0`
+image_filter_pro: ^0.1.5`
 
 ## Usage
 
