@@ -146,8 +146,8 @@ Or if you want to extend:
                        ]  
      )  
 
-By default, the widget will just pop itself when tapping on apply icons and return a File where the filter has been applied to.
-It is also possible to trigger callback when tapping in cancel or on apply filter:
+By default, the widget will just pop itself when tapping on apply icon and return a File where the filter has been applied to.
+It is also possible to trigger callback when tapping on cancel or on apply filter, the filter widget will pop instantly but the applying of the filter to image will run in background
 
 
      PhotoFilter( 

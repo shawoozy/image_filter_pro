@@ -6,7 +6,6 @@
 
 ## [0.1.7]
 
-
 ### Bug fix
 - Improved the onApply callback
 
