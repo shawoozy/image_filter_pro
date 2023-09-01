@@ -11,12 +11,20 @@ class ImageProcessor {
     return img.decodeImage(Uint8List.fromList(bytes));
   }
 
-  static Future<File> saveImage(img.Image image) async {
+  static Future<File> saveImage(img.Image image, bool shouldCompress, int? compressQuality) async
+  {
+    image = shouldCompress ? compressImage(image,compressQuality ?? 75) : image;
+
     final directory = await getTemporaryDirectory();
     final path = "${directory.path}/${generateRandomString()}.png";
     final File file = File(path);
     file.writeAsBytesSync(img.encodePng(image));
     return file;
+  }
+
+  static img.Image compressImage(img.Image originalImage, int quality) {
+    Uint8List? compressedBytes = img.encodeJpg(originalImage, quality: quality);
+    return img.decodeImage(compressedBytes)!;
   }
 }
 
