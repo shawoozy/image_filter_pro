@@ -1,6 +1,12 @@
 
 # Changelog
 
+
+### Readme updated
+- Readme updated
+
+## [0.1.8]
+
 ### Performance improvement
 - Big performance improvement by using Isolate when applying filter
 
