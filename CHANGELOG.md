@@ -1,6 +1,10 @@
 
 # Changelog
 
+## [0.1.9]
+
+### Compress added
+- Added option to compress image to reduce size
 
 ### Readme updated
 - Readme updated

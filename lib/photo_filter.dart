@@ -55,6 +55,12 @@ class PhotoFilter extends StatefulWidget {
   /// The call back when applying filter is finished to apply filter and generate new Image.
   final void Function(File?)? onFinishApplyingFilter;
 
+  /// The boolean if image has to be compressed when applying filter.
+  final bool compressImage;
+
+  /// The value of the quality for compressing the image.
+  final int? compressQuality;
+
   /// Creates a new ImageFilterWidget instance.
   ///
   /// The [image] parameter specifies the image to which filters will be applied.
@@ -94,18 +100,30 @@ class PhotoFilter extends StatefulWidget {
   /// The [onFinishApplyingFilter] parameter defines the call back action
   /// to trigger when applying the filter is done.
   ///
-  const PhotoFilter({super.key,
-    required this.image,
-    this.presets = defaultColorFilters,
-    required this.cancelIcon,
-    required this.applyIcon,
-    this.backgroundColor = Colors.black,
-    this.sliderColor,
-    this.sliderLabelStyle,
-    this.bottomButtonsTextStyle,
-    this.presetsLabelTextStyle,
-    this.applyingTextStyle,
-    this.onCancel, this.onStartApplyingFilter, this.onFinishApplyingFilter});
+  /// The [compressImage] parameter defines if the image should be compressed
+  /// while applying filter to reduce size.
+  ///
+  /// The [compressQuality] parameter defines the quality of the image
+  /// after compressing it. Higher number results in bigger file size.
+  /// default value is 75 if compressImage is true.
+  ///
+  const PhotoFilter(
+      {super.key,
+      required this.image,
+      this.presets = defaultColorFilters,
+      required this.cancelIcon,
+      required this.applyIcon,
+      this.backgroundColor = Colors.black,
+      this.sliderColor,
+      this.sliderLabelStyle,
+      this.bottomButtonsTextStyle,
+      this.presetsLabelTextStyle,
+      this.applyingTextStyle,
+      this.onCancel,
+      this.onStartApplyingFilter,
+      this.onFinishApplyingFilter,
+      this.compressImage = false,
+      this.compressQuality});
 
   @override
   _PhotoFilterState createState() => _PhotoFilterState();
@@ -384,6 +402,8 @@ class _PhotoFilterState extends State<PhotoFilter> {
                   _newIsolate = await Isolate.spawn(
                       _applyFilter,
                       ApplyFilterParams(
+                          shouldCompress: widget.compressImage,
+                          compressQuality: widget.compressQuality,
                           rootIsolateToken: RootIsolateToken.instance!,
                           rawFile: widget.image,
                           colorMatrix: _selectedFilter!.colorFilterMatrix,

@@ -14,9 +14,13 @@ class ApplyFilterParams {
   final List<double> defaultMatrix;
   final SendPort sendPort;
   final RootIsolateToken rootIsolateToken;
+  final bool shouldCompress;
+  final int? compressQuality;
 
   ApplyFilterParams(
-      {required this.rootIsolateToken,
+      {required this.shouldCompress,
+      this.compressQuality,
+      required this.rootIsolateToken,
       required this.sendPort,
       required this.rawFile,
       required this.colorMatrix,

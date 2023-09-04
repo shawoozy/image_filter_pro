@@ -47,7 +47,7 @@ class FilterManager {
       }
     }
 
-    return await ImageProcessor.saveImage(image);
+    return await ImageProcessor.saveImage(image, applyFilterParams.shouldCompress, applyFilterParams.compressQuality);
   }
 
   static List<int> _multiplyByColorFilter(List<num> color, List<double> matrix) {
