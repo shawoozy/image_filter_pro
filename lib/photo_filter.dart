@@ -161,50 +161,52 @@ class _PhotoFilterState extends State<PhotoFilter> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: widget.backgroundColor,
-      body: Stack(
-        children: [
-          Column(
-            children: <Widget>[
-              _topButtons(context),
-              const SizedBox(height: 8),
-              _mainImage(),
-              const SizedBox(height: 8),
-              if (_showSliders) ...[
-                _buildSlider("Brightness", midBrightness - 0.4, midBrightness + 0.4, _brightness, (value) {
-                  _brightness = value;
-                }),
-                _buildSlider("Contrast", midContrast - 0.0035, midContrast + 0.0035, _contrast, (value) {
-                  _contrast = value;
-                }),
-                _buildSlider("Saturation", midSaturation - 2.0, midSaturation + 2.0, _saturation, (value) {
-                  _saturation = value;
-                }),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Column(
+              children: <Widget>[
+                _topButtons(context),
+                const SizedBox(height: 8),
+                _mainImage(),
+                const SizedBox(height: 8),
+                if (_showSliders) ...[
+                  _buildSlider("Brightness", midBrightness - 0.4, midBrightness + 0.4, _brightness, (value) {
+                    _brightness = value;
+                  }),
+                  _buildSlider("Contrast", midContrast - 0.0035, midContrast + 0.0035, _contrast, (value) {
+                    _contrast = value;
+                  }),
+                  _buildSlider("Saturation", midSaturation - 2.0, midSaturation + 2.0, _saturation, (value) {
+                    _saturation = value;
+                  }),
+                ],
+                if (_showPreset) ...[
+                  _presets(),
+                ],
+                const SizedBox(
+                  height: 8,
+                ),
+                _bottomButtons(),
+                const SizedBox(
+                  height: 16,
+                ),
               ],
-              if (_showPreset) ...[
-                _presets(),
-              ],
-              const SizedBox(
-                height: 8,
-              ),
-              _bottomButtons(),
-              const SizedBox(
-                height: 16,
-              ),
-            ],
-          ),
-          if (_isApplying) ...[
-            SizedBox.fromSize(
-                size: MediaQuery.sizeOf(context),
-                child: Container(
-                  color: Colors.black.withOpacity(.9),
-                  child: Center(
-                      child: Text(
-                        "Applying filter...",
-                        style: widget.applyingTextStyle ?? const TextStyle(color: Colors.grey, fontSize: 13),
-                      )),
-                ))
-          ]
-        ],
+            ),
+            if (_isApplying) ...[
+              SizedBox.fromSize(
+                  size: MediaQuery.sizeOf(context),
+                  child: Container(
+                    color: Colors.black.withOpacity(.9),
+                    child: Center(
+                        child: Text(
+                          "Applying filter...",
+                          style: widget.applyingTextStyle ?? const TextStyle(color: Colors.grey, fontSize: 13),
+                        )),
+                  ))
+            ]
+          ],
+        ),
       ),
     );
   }
