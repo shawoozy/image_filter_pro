@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_filter_pro/apply_filter_params.dart';
 
-import 'filter_manager.dart';
+import 'apply_filter_nonweb.dart' if (dart.library.html) 'apply_filter_web.dart';
 import 'named_color_filter.dart';
 
 const double midBrightness = 0.627;
@@ -402,7 +402,7 @@ class _PhotoFilterState extends State<PhotoFilter> {
 
                   final ReceivePort _receivePort = ReceivePort();
                   _newIsolate = await Isolate.spawn(
-                      _applyFilter,
+                      applyFilter,
                       ApplyFilterParams(
                           shouldCompress: widget.compressImage,
                           compressQuality: widget.compressQuality,
@@ -435,12 +435,6 @@ class _PhotoFilterState extends State<PhotoFilter> {
         ),
       ),
     );
-  }
-
-  static void _applyFilter(ApplyFilterParams applyFilterParams) async {
-    BackgroundIsolateBinaryMessenger.ensureInitialized(applyFilterParams.rootIsolateToken);
-    File filteredImageFile = await FilterManager.applyFilter(applyFilterParams);
-    applyFilterParams.sendPort.send(filteredImageFile);
   }
 
   List<double> _generateColorMatrix() {
